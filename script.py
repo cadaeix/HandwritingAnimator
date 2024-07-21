@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 from svgpathtools import parse_path
 from PIL import Image, ImageDraw
 import numpy as np
+import colorsys
 
 
 def extract_paths_data(svg_file):
@@ -49,6 +50,12 @@ def get_variable_width(t, base_width, max_width):
         return max_width
 
 
+def get_rainbow_color(progress):
+    hue = progress % 1.0
+    rgb = colorsys.hsv_to_rgb(hue, 1.0, 1.0)
+    return tuple(int(x * 255) for x in rgb)
+
+
 def create_frame(
     paths,
     progress,
@@ -58,6 +65,8 @@ def create_frame(
     base_stroke_width,
     use_variable_width,
     padding,
+    is_loopback,
+    use_rainbow_mode,
 ):
     img = Image.new("RGBA", (width, height), color=(255, 255, 255, 0))
     draw = ImageDraw.Draw(img)
@@ -93,34 +102,53 @@ def create_frame(
             continue
         elif progress >= path_end_progress:
             # Draw the entire path
+            if use_rainbow_mode:
+                path_color = get_rainbow_color(path_start_progress)
+            else:
+                path_color = color
             draw_path(
                 draw,
                 path,
                 scale,
                 offset_x,
                 offset_y,
-                color,
+                path_color,
                 base_stroke_width,
                 use_variable_width,
                 0,
                 1,
+                is_loopback,
+                use_rainbow_mode,
+                path_start_progress,
+                path_end_progress,
             )
         else:
             # Draw partial path
             path_progress = (progress - path_start_progress) / (
                 path_end_progress - path_start_progress
             )
+            if use_rainbow_mode:
+                path_color = get_rainbow_color(
+                    path_start_progress
+                    + path_progress * (path_end_progress - path_start_progress)
+                )
+            else:
+                path_color = color
             draw_path(
                 draw,
                 path,
                 scale,
                 offset_x,
                 offset_y,
-                color,
+                path_color,
                 base_stroke_width,
                 use_variable_width,
                 0,
                 path_progress,
+                is_loopback,
+                use_rainbow_mode,
+                path_start_progress,
+                path_end_progress,
             )
             break
 
@@ -140,12 +168,17 @@ def draw_path(
     use_variable_width,
     start,
     end,
+    is_loopback,
+    use_rainbow_mode,
+    path_start_progress,
+    path_end_progress,
 ):
     cumulative_length = np.cumsum([seg.length() for seg in path])
     total_path_length = cumulative_length[-1]
 
     points = []
     widths = []
+    colors = []
 
     for i, segment in enumerate(path):
         seg_start = cumulative_length[i - 1] / total_path_length if i > 0 else 0
@@ -159,13 +192,15 @@ def draw_path(
         t_start = max(0, (start - seg_start) / (seg_end - seg_start))
         t_end = min(1, (end - seg_start) / (seg_end - seg_start))
 
-        # Increase the number of points sampled along each segment
+        if is_loopback:
+            t_end = min(t_end, 0.4)
+
         num_points = max(50, int(500 * segment.length() / total_path_length))
-        seg_points = [segment.point(t) for t in np.linspace(t_start, t_end, num_points)]
+        t_values = np.linspace(t_start, t_end, num_points)
+        seg_points = [segment.point(t) for t in t_values]
         points.extend(seg_points)
 
         if use_variable_width:
-            # Calculate the global t value for each point in this segment
             global_t_values = np.linspace(
                 seg_start + t_start * (seg_end - seg_start),
                 seg_start + t_end * (seg_end - seg_start),
@@ -179,19 +214,33 @@ def draw_path(
         else:
             widths.extend([base_stroke_width] * num_points)
 
-    # Use a smoother drawing method
+        if use_rainbow_mode:
+            seg_colors = [
+                get_rainbow_color(
+                    path_start_progress
+                    + (path_end_progress - path_start_progress)
+                    * (seg_start + t * (seg_end - seg_start))
+                )
+                for t in t_values
+            ]
+            colors.extend(seg_colors)
+
     for i in range(len(points) - 1):
         p1 = points[i]
         p2 = points[i + 1]
-        w = (widths[i] + widths[i + 1]) / 2  # Average width between two points
+        w = (widths[i] + widths[i + 1]) / 2
+        if use_rainbow_mode:
+            line_color = colors[i]
+        else:
+            line_color = color
         draw.line(
             [
                 (p1.real * scale + offset_x, p1.imag * scale + offset_y),
                 (p2.real * scale + offset_x, p2.imag * scale + offset_y),
             ],
-            fill=color,
+            fill=line_color,
             width=int(w),
-            joint="curve",  # This can help smooth out corners
+            joint="curve",
         )
 
 
@@ -206,6 +255,8 @@ def create_animation(
     use_variable_width,
     linger_time,
     padding,
+    is_loopback,
+    use_rainbow_mode,
 ):
     total_frames = int((duration + linger_time) * fps)
     animation_frames = int(duration * fps)
@@ -224,10 +275,11 @@ def create_animation(
             base_stroke_width,
             use_variable_width,
             padding,
+            is_loopback,
+            use_rainbow_mode,
         )
         frames.append(frame)
 
-    # Add lingering frames
     last_frame = frames[-1]
     frames.extend([last_frame] * linger_frames)
 
@@ -237,15 +289,15 @@ def create_animation(
 def main():
     svg_file = "input.svg"
     output_file = "output.gif"
-    duration = 4  # Animation duration in seconds
-    fps = 30  # Frames per second
-    color_hex = (
-        "#000000"  # Default color is black, can be changed to any hex color code
-    )
-    base_stroke_width = 2  # Base stroke width
-    use_variable_width = True  # Set to False for constant width
-    linger_time = 1  # Time in seconds to linger on the completed text
-    padding_percent = 0.05  # Padding as a percentage of the image size
+    duration = 4
+    fps = 30
+    color_hex = "#ffffff"
+    base_stroke_width = 1
+    use_variable_width = True  # Tapering at ends of strokes
+    linger_time = 1
+    padding_percent = 0.05
+    is_loopback = False  # For unedited Calligrapher.ai files
+    use_rainbow_mode = False
 
     paths_data, width, height = extract_paths_data(svg_file)
     paths = parse_svg_paths(paths_data)
@@ -273,9 +325,10 @@ def main():
         use_variable_width,
         linger_time,
         padding,
+        is_loopback,
+        use_rainbow_mode,
     )
 
-    # Save as GIF with transparency
     frames[0].save(
         output_file,
         save_all=True,
