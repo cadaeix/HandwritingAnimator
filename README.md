@@ -2,9 +2,11 @@
 
 This Python script animates SVGs of handwriting, creating GIF animations that simulate the writing process.
 
-Example animations from SVGs traced in Inkscape from public domain historical figure signatures:
-![Marshal Lannes' Signature](examples/lannes.gif)
-![Marshal Soult's Signature](examples/soult.gif)
+Example animations from SVGs traced in Inkscape from public domain historical figure signatures ([Jean Lannes](https://en.wikipedia.org/wiki/Jean_Lannes) and [Jean-de-Dieu Soult](https://en.wikipedia.org/wiki/Jean-de-Dieu_Soult)):
+<p align="center">
+  <img src="examples/lannes.gif" alt="Marshal Lannes' Signature" width="400" style="margin-right: 20px;">
+  <img src="examples/soult.gif" alt="Marshal Soult's Signature" width="400">
+</p>
 
 ## Features
 
@@ -65,8 +67,7 @@ This project was developed in collaboration with Claude.ai.
 
 ## Contributing
 
-Feel free to submit a pull request.
+Feel free to submit a pull request or something
 
 ## Todo?
-
-What if I bundle a handwriting generator model with this
+- Attach this to something inspired by [this](https://github.com/sjvasquez/handwriting-synthesis) so that you can generate both the handwriting and the animation in one step???
