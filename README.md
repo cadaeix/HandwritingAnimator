@@ -6,7 +6,7 @@ This Python script animates SVGs of handwriting, creating GIF animations that si
 
 - Works best with unidirectional paths, such as those created by tracing handwriting in programs like Inkscape
 - Compatible with files generated from [Calligrapher.ai](https://www.calligrapher.ai/) (use the lowest Stroke Width setting)
-- 
+
 ## Prerequisites
 
 - Python 3.7 or later
@@ -55,6 +55,14 @@ If you prefer more control over the animation process, you can use `script.py` i
 
 This project was developed in collaboration with Claude.ai.
 
+## License
+
+[CC0](https://github.com/cadaeix/HandwritingAnimator/blob/main/LICENSE)
+
 ## Contributing
 
 Feel free to submit a pull request.
+
+## Todo?
+
+What if I bundle a handwriting generator model with this
