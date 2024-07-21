@@ -1,4 +1,4 @@
-# Handwriting Animator
+![Handwriting Animator](examples/title.gif)
 
 This Python script animates SVGs of handwriting, creating GIF animations that simulate the writing process.
 
