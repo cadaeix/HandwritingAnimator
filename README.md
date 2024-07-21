@@ -2,6 +2,10 @@
 
 This Python script animates SVGs of handwriting, creating GIF animations that simulate the writing process.
 
+Example animations from SVGs traced in Inkscape from public domain historical figure signatures:
+![Marshal Lannes' Signature](examples/lannes.gif)
+![Marshal Soult's Signature](examples/soult.gif)
+
 ## Features
 
 - Works best with unidirectional paths, such as those created by tracing handwriting in programs like Inkscape
