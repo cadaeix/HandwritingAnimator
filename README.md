@@ -3,6 +3,7 @@
 This Python script animates SVGs of handwriting, creating GIF animations that simulate the writing process.
 
 Example animations from SVGs traced in Inkscape from public domain historical figure signatures ([Jean Lannes](https://en.wikipedia.org/wiki/Jean_Lannes) and [Jean-de-Dieu Soult](https://en.wikipedia.org/wiki/Jean-de-Dieu_Soult)):
+
 <p align="center">
   <img src="examples/lannes.gif" alt="Marshal Lannes' Signature" width="400" style="margin-right: 20px;">
   <img src="examples/soult.gif" alt="Marshal Soult's Signature" width="400">
@@ -13,6 +14,8 @@ Example animations from SVGs traced in Inkscape from public domain historical fi
 - Works best with unidirectional paths, such as those created by tracing handwriting in programs like Inkscape
 - Compatible with files generated from [Calligrapher.ai](https://www.calligrapher.ai/) (use the lowest Stroke Width setting)
 
+![Example from Calligrapher.ai without editing](examples/somebody.gif)
+
 ## Prerequisites
 
 - Python 3.7 or later
@@ -20,12 +23,15 @@ Example animations from SVGs traced in Inkscape from public domain historical fi
 ## Installation
 
 1. Clone the repository or download the ZIP file:
+
    ```
    git clone https://github.com/cadaeix/HandwritingAnimator.git
    ```
+
    Or download and extract the ZIP file from the [GitHub repository](https://github.com/cadaeix/HandwritingAnimator).
 
 2. Navigate to the project directory:
+
    ```
    cd HandwritingAnimator
    ```
@@ -40,6 +46,7 @@ Example animations from SVGs traced in Inkscape from public domain historical fi
 1. Place your SVG file in the project directory.
 
 2. Run the CLI tool:
+
    ```
    python svg_to_gif.py
    ```
@@ -70,4 +77,5 @@ This project was developed in collaboration with Claude.ai.
 Feel free to submit a pull request or something
 
 ## Todo?
+
 - Attach this to something inspired by [this](https://github.com/sjvasquez/handwriting-synthesis) so that you can generate both the handwriting and the animation in one step???
