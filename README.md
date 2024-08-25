@@ -70,7 +70,7 @@ This project was developed in collaboration with Claude.ai.
 
 ## License
 
-[CC0](https://github.com/cadaeix/HandwritingAnimator/blob/main/LICENSE)
+[Unlicense](https://github.com/cadaeix/HandwritingAnimator/blob/main/LICENSE)
 
 ## Contributing
 
